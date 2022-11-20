@@ -42,6 +42,7 @@ async function run(){
         const bookingsCollection = client.db('doctorsPortal').collection('bookings')
 
         const usersCollection = client.db('doctorsPortal').collection('users')
+        const doctorCollection = client.db('doctorsPortal').collection('doctors')
 
         app.get('/appointmentOptions',  async(req, res) =>{
             const date = req.query.date
@@ -56,6 +57,12 @@ async function run(){
                 option.slots = remainingSlots
             })
             res.send(options)
+        })
+
+        app.get('/appointmentSpecialty', async(req,res)=>{
+            const query = {}
+            const result = await appointmentOptionsCollection.find(query).project({name: 1}).toArray()
+            res.send(result)
         })
 
 
@@ -141,6 +148,18 @@ async function run(){
                 }
             }
             const result = await usersCollection.updateOne(filter, updatedDoc,options)
+            res.send(result)
+        });
+
+        app.get('/doctors', async(req, res) =>{
+            const query = {}
+            const doctors = await doctorCollection.find(query).toArray()
+            res.send(doctors);
+        })
+
+        app.post('/doctors', async(req, res) =>{
+            const doctor = req.body;
+            const result = await doctorCollection.insertOne(doctor)
             res.send(result)
         })
     }
